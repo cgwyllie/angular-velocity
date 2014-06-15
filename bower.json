@@ -5,13 +5,12 @@
   "authors": [
     "Christopher Wyllie <cgwyllie@gmail.com>"
   ],
-  "description": "AngularJS ngAnimate integration for the VelocityJS animation library UI pack",
+  "description": "AngularJS ngAnimate integration for the Velocity animation library UI pack plugin",
   "keywords": [
     "AngularJS",
     "angular",
     "ngAnimate",
-    "VelocityJS",
-    "velocity",
+    "Velocity",
     "animation"
   ],
   "license": "MIT",
