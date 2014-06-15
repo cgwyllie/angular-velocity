@@ -1,0 +1,30 @@
+{
+  "name": "angular-velocity",
+  "main": "angular-velocity.js",
+  "version": "0.0.1",
+  "authors": [
+    "Christopher Wyllie <cgwyllie@gmail.com>"
+  ],
+  "description": "AngularJS ngAnimate integration for the VelocityJS animation library UI pack",
+  "keywords": [
+    "AngularJS",
+    "angular",
+    "ngAnimate",
+    "VelocityJS",
+    "velocity",
+    "animation"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular-animate": "~1.2.18",
+    "angular": "~1.2.18",
+    "velocity": "~0.1.0"
+  }
+}
