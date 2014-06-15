@@ -19,7 +19,7 @@ bower install angular-velocity
 
 Include `angular-velocity.js` and declare it as a dependency on your Angular app's module:
 
-```
+```javascript
 angular.module('your-app', ['angular-velocity']);
 ```
 
@@ -29,10 +29,9 @@ From Velocity, the period in a transition or callout name is replaced by a hyphe
 
 This animation name is then used as a class name on any element you want to animate with the ngAnimate system, for example:
 
-```
-
+```html
 <div class="velocity-transition-slideUpIn" ng-show="someCondition">
-I've been animaetd with Velocity and Angular!
+	I've been animaetd with Velocity and Angular!
 </div>
 
 ```
@@ -45,7 +44,7 @@ These are defined with the prefix `velocity-opposites-` and will work with ngAni
 
 For example:
 
-```
+```html
 <div ng-view class="velocity-opposites-transition-slideUpIn">
 	I leave with a transition.slideDownOut.
 </div>
