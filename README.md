@@ -1,7 +1,7 @@
 
 # Angular Velocity
 
-AngularJS ngAnimate integration for the VelocityJS animation library's UI pack plugin.
+[http://angularjs.org](AngularJS) ngAnimate integration for the [http://velocityjs.org](Velocity) animation library's UI pack plugin.
 
 ## Installation
 
@@ -13,8 +13,8 @@ bower install angular-velocity
 
 ### Dependencies
 
-- VelocityJS
-- VelocityJS UI Pack Plugin
+- Velocity
+- Velocity UI Pack Plugin
 - ngAnimate
 
 Include `angular-velocity.js` and declare it as a dependency on your Angular app's module:
@@ -56,4 +56,4 @@ Please feel free to fork, push, pull and all that other good Git stuff!
 
 # Disclaimer
 
-This project is not associated officially with either AngularJS or VelocityJS. It is just a little utility that was quickly thrown together to bridge an animation-shaped gap.
+This project is not associated officially with either AngularJS or Velocity. It is just a little utility that was quickly thrown together to bridge an animation-shaped gap.
