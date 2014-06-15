@@ -1,7 +1,7 @@
 
 # Angular Velocity
 
-[http://angularjs.org](AngularJS) ngAnimate integration for the [http://velocityjs.org](Velocity) animation library's UI pack plugin.
+[AngularJS](http://angularjs.org) ngAnimate integration for the [Velocity](http://velocityjs.org) animation library's UI pack plugin.
 
 ## Installation
 
