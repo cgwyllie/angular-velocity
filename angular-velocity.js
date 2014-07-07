@@ -72,9 +72,8 @@
 		return 'velocity-opposites-' + animation.replace('.', '-');
 	}
 
-	function makeAnimFor(animation) {
+	function makeAnimFor(animation, $timeout) {
 		return function ($el, done) {
-			// console.log('Running animation ' + animation);
 			$el.velocity(animation, {
 				complete: done
 			});
@@ -105,11 +104,72 @@
 	}
 
 	function makeAngularAnimationFor(animation) {
-		return function () {
+		return function ($timeout, $parse) {
+
+			var queue = { enter : [], leave : [] };
+			  function queueAllAnimations(event, element, done, onComplete) {
+			    var index = queue[event].length;
+			    queue[event].push({
+			      element : element,
+			      done : done
+			    });
+			    queue[event].timer && $timeout.cancel(queue[event].timer);
+			    queue[event].timer = $timeout(function() {
+			      var elms = [], doneFns = [];
+			      angular.forEach(queue[event], function(item) {
+			        item && elms.push(item.element);
+			        doneFns.push(item.done);
+			      });
+			      var onDone = function() {
+			        angular.forEach(doneFns, function(fn) {
+			          fn();
+			        });
+			      };
+			      onComplete(elms, onDone);
+			      queue[event] = [];
+			    }, 10, false);
+
+			    return function() {
+			      queue[event] = [];
+			    }
+			  };
+
 			return {
-				enter: makeAnimFor(animation),
-				leave: makeAnimFor(animation),
-				move: makeAnimFor(animation),
+				//enter: makeAnimFor(animation, $timeout),
+				enter: function ($el, done) {
+
+					var optsAttrVal = $el.attr('data-velocity-opts'),
+						scope = $el.scope(),
+						opts = {
+							complete: done
+						},
+						userOpts, completeFn;
+
+					if (optsAttrVal) {
+						userOpts = $parse(optsAttrVal)(scope);
+						angular.extend(opts, userOpts);
+						if (userOpts.complete) {
+							opts.complete = function () {
+								done();
+								scope.$apply(userOpts.complete);
+							};
+						}
+					}
+
+					console.log(opts);
+
+					$el.css('opacity', 0);
+
+					var cancel = queueAllAnimations('enter', $el[0], done, function(elements, done) {
+						$(elements).velocity(animation, opts);
+					});
+
+					return function onClose(cancelled) {
+						cancelled && cancel();
+					};
+				},
+				leave: makeAnimFor(animation, $timeout),
+				move: makeAnimFor(animation, $timeout),
 				addClass: makeClassAnimFor(animation),
 				removeClass: makeClassAnimFor(animation)
 			};
