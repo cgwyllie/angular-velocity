@@ -54,8 +54,7 @@
 		};
 
 		return function queueAllAnimations(event, element, done, onComplete) {
-				var eventQueue = queue[event],
-					index = eventQueue.length;
+				var eventQueue = queue[event];
 
 				eventQueue.push({
 					element : element,
@@ -152,11 +151,11 @@
 			var queueFn = newAnimationQueue($timeout);
 
 			return {
-				enter: makeGroupedAnimFor(animation, 'enter', queueFn, $parse),
-				leave: makeGroupedAnimFor(animation, 'leave', queueFn, $parse),
-				move: makeAnimFor(animation, $parse),
-				addClass: makeClassAnimFor(animation, $parse),
-				removeClass: makeClassAnimFor(animation, $parse)
+				'enter': makeGroupedAnimFor(animation, 'enter', queueFn, $parse),
+				'leave': makeGroupedAnimFor(animation, 'leave', queueFn, $parse),
+				'move': makeAnimFor(animation, $parse),
+				'addClass': makeClassAnimFor(animation, $parse),
+				'removeClass': makeClassAnimFor(animation, $parse)
 			};
 		}];
 	}
@@ -182,11 +181,11 @@
 			}
 
 			return {
-				enter: makeGroupedAnimFor(animation, 'enter', queueFn, $parse),
-				leave: makeGroupedAnimFor(opp, 'leave', queueFn, $parse),
-				move: makeAnimFor(animation, $parse),
-				addClass: makeClassAnimFor(animation, $parse),
-				removeClass: makeClassAnimFor(opp, $parse)
+				'enter': makeGroupedAnimFor(animation, 'enter', queueFn, $parse),
+				'leave': makeGroupedAnimFor(opp, 'leave', queueFn, $parse),
+				'move': makeAnimFor(animation, $parse),
+				'addClass': makeClassAnimFor(animation, $parse),
+				'removeClass': makeClassAnimFor(opp, $parse)
 			};
 		}];
 	}
