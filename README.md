@@ -3,25 +3,29 @@
 
 [AngularJS](http://angularjs.org) ngAnimate integration for the [Velocity](http://velocityjs.org) animation library's UI pack plugin.
 
-## Installation
+## Getting Started
+
+### Install with Bower
 
 ```
-bower install angular-velocity
+bower install angular-velocity --save
 ```
 
-## Usage
+### Include Scripts
 
-### Dependencies
+```html
+<script src="bower_components/velocity/jquery.velocity.min.js"></script>
+<script src="bower_components/velocity/velocity.ui.js"></script>
+<script src="bower_components/angular-velocity/angular-velocity.min.js"></script>
+```
 
-- Velocity
-- Velocity UI Pack Plugin
-- ngAnimate
-
-Include `angular-velocity.js` and declare it as a dependency on your Angular app's module:
+### Declare Angular Dependency
 
 ```javascript
 angular.module('your-app', ['angular-velocity']);
 ```
+
+## Usage
 
 This module declares Angular animations for each of the animations in the UI pack of Velocity following a standardised naming convention.
 
@@ -31,9 +35,8 @@ This animation name is then used as a class name on any element you want to anim
 
 ```html
 <div class="velocity-transition-slideUpIn" ng-show="someCondition">
-	I've been animaetd with Velocity and Angular!
+	I've been animated with Velocity and Angular!
 </div>
-
 ```
 
 ### Opposites
@@ -50,6 +53,39 @@ For example:
 </div>
 ```
 
+### Velocity Options
+
+Setting [Velocity options](http://julian.com/research/velocity/#arguments) is possible by defining the `data-velocity-opts` attribute on your animated element. This is an Angular-aware expression, so you can pass objects, bindings, or references to scope objects:
+
+```html
+<div 
+    class="velocity-transition-slideUpIn"
+    ng-show="someCondition"
+    data-velocity-opts="{ duration: 5000 }">
+	I've been animated with Velocity and Angular!
+</div>
+```
+
+### Stagger
+
+Staggering is supported for `ngEnter` and `ngLeave` animations. This works especially well with `ngRepeat`:
+
+```html
+<ul>
+	<li 
+	    class="velocity-transition-bounceRightIn"
+	    data-velocity-opts="{ stagger: 350 }"
+	    ng-repeat="item in items">
+		{{ item }}
+	</li>
+</ul>
+```
+
+> **Complete Function**
+> 
+> The Velocity `complete` callback can be passed in the options and will be executed against your element's scope in a digest cycle.
+
+
 ## Contributing
 
 Please feel free to fork, push, pull and all that other good Git stuff!
@@ -57,3 +93,7 @@ Please feel free to fork, push, pull and all that other good Git stuff!
 # Disclaimer
 
 This project is not associated officially with either AngularJS or Velocity. It is just a little utility that was quickly thrown together to bridge an animation-shaped gap.
+
+# Thanks
+
+- [@rosslavery](https://github.com/rosslavery) for an example of how to access UI pack animations
