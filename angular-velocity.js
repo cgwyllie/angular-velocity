@@ -1,82 +1,101 @@
 
 (function () {
 	
+	'use strict';
+
 	var app = angular.module('angular-velocity', ['ngAnimate']);
 
-	var animations = [
-		'fadeIn',
-		'fadeOut',
-		'callout.bounce',
-		'callout.shake',
-		'callout.flash',
-		'callout.pulse',
-		'callout.swing',
-		'callout.tada',
-		'transition.flipXIn',
-		'transition.flipXOut',
-		'transition.flipYIn',
-		'transition.flipYOut',
-		'transition.flipBounceXIn',
-		'transition.flipBounceXOut',
-		'transition.flipBounceYIn',
-		'transition.flipBounceYOut',
-		'transition.swoopIn',
-		'transition.swoopOut',
-		'transition.whirlIn',
-		'transition.whirlOut',
-		'transition.shrinkIn',
-		'transition.shrinkOut',
-		'transition.expandIn',
-		'transition.expandOut',
-		'transition.bounceIn',
-		'transition.bounceOut',
-		'transition.bounceUpIn',
-		'transition.bounceUpOut',
-		'transition.bounceDownIn',
-		'transition.bounceDownOut',
-		'transition.bounceLeftIn',
-		'transition.bounceLeftOut',
-		'transition.bounceRightIn',
-		'transition.bounceRightOut',
-		'transition.slideUpIn',
-		'transition.slideUpOut',
-		'transition.slideDownIn',
-		'transition.slideDownOut',
-		'transition.slideLeftIn',
-		'transition.slideLeftOut',
-		'transition.slideRightIn',
-		'transition.slideRightOut',
-		'transition.slideUpBigIn',
-		'transition.slideUpBigOut',
-		'transition.slideDownBigIn',
-		'transition.slideDownBigOut',
-		'transition.slideLeftBigIn',
-		'transition.slideLeftBigOut',
-		'transition.slideRightBigIn',
-		'transition.slideRightBigOut',
-		'transition.perspectiveUpIn',
-		'transition.perspectiveUpOut',
-		'transition.perspectiveDownIn',
-		'transition.perspectiveDownOut',
-		'transition.perspectiveLeftIn',
-		'transition.perspectiveLeftOut',
-		'transition.perspectiveRightIn',
-		'transition.perspectiveRightOut'
-	];
+	// Check we have velocity and the UI pack
+	if (!$.Velocity || !$.Velocity.Utilities) {
+		throw "Velocity and Velocity UI Pack required, please include the relevant JS files...";
+	}
 
+	// Utility to create class name for a sequence
 	function animationToClassName(animation) {
 		return 'velocity-' + animation.replace('.', '-');
 	}
 
+	// Utility to create an opposites class name for a sequence
 	function animationToOppositesClassName(animation) {
 		return 'velocity-opposites-' + animation.replace('.', '-');
 	}
 
-	function makeAnimFor(animation, $timeout) {
-		return function ($el, done) {
-			$el.velocity(animation, {
+	// Utility to parse out velocity options
+	function getVelocityOpts($parse, $el, done) {
+		var optsAttrVal = $el.attr('data-velocity-opts'),
+			scope = $el.scope(),
+			opts = {
 				complete: done
-			});
+			},
+			userOpts;
+
+		if (optsAttrVal) {
+			userOpts = $parse(optsAttrVal)(scope);
+			angular.extend(opts, userOpts);
+			if (userOpts.complete) {
+				opts.complete = function () {
+					done();
+					scope.$apply(userOpts.complete);
+					scope = null;
+				};
+			}
+		}
+
+		return opts;
+	}
+
+	// Utility for queueing animations together.
+	// Staggering isn't natively supported by ngAnimate for JS animations yet, so
+	// we use the workaround from: http://www.yearofmoo.com/2013/12/staggering-animations-in-angularjs.html
+	function newAnimationQueue($timeout) {
+		var queue = {
+			enter: [],
+			leave: []
+		};
+
+		return function queueAllAnimations(event, element, done, onComplete) {
+				var eventQueue = queue[event],
+					index = eventQueue.length;
+
+				eventQueue.push({
+					element : element,
+					done : done
+				});
+
+				eventQueue.timer && $timeout.cancel(eventQueue.timer);
+				eventQueue.timer = $timeout(function() {
+					var elms = [],
+						doneFns = [],
+						onDone;
+
+					angular.forEach(eventQueue, function(item) {
+						item && elms.push(item.element);
+						doneFns.push(item.done);
+					});
+
+					onDone = function() {
+						angular.forEach(doneFns, function(fn) {
+						  fn();
+						});
+					};
+
+					onComplete(elms, onDone);
+					queue[event] = [];
+				}, 10, false);
+
+				return function() {
+					queue[event] = [];
+				};
+			};
+	}
+
+	// Factory for the angular animation effect function (move animations)
+	function makeAnimFor(animation, $parse) {
+		return function ($el, done) {
+
+			var opts = getVelocityOpts($parse, $el, done);
+
+			$el.velocity(animation, opts);
 
 			return function (cancel) {
 				if (cancel) {
@@ -86,13 +105,15 @@
 		};
 	}
 
-	function makeClassAnimFor(animation) {
+	// Factory for the angular animation effect function (class animations)
+	function makeClassAnimFor(animation, $parse) {
 		return function ($el, className, done) {
-			// console.log('Running animation ' + animation);
+
 			if ('ng-hide' === className || 'ng-show' === className) {
-				$el.velocity(animation, {
-					complete: done
-				});
+
+				var opts = getVelocityOpts($parse, $el, done);
+			
+				$el.velocity(animation, opts);
 
 				return function (cancel) {
 					if (cancel) {
@@ -103,122 +124,83 @@
 		};
 	}
 
+	// Factory for the angular animation effect function (grouped animations)
+	function makeGroupedAnimFor(animation, event, queueFn, $parse) {
+		return function ($el, done) {
+
+			var opts = getVelocityOpts($parse, $el, done);
+
+			// Hide element so it doesn't briefly show whilst queue is built
+			if (event === 'enter') {
+				$el.css('opacity', 0);
+			}
+
+			var cancel = queueFn(event, $el[0], done, function(elements, done) {
+				$(elements).velocity(animation, opts);
+			});
+
+			return function onClose(cancelled) {
+				cancelled && cancel();
+			};
+		};
+	}
+
+	// Factory for making animations
 	function makeAngularAnimationFor(animation) {
-		return function ($timeout, $parse) {
+		return ['$timeout', '$parse', function ($timeout, $parse) {
 
-			var queue = { enter : [], leave : [] };
-			  function queueAllAnimations(event, element, done, onComplete) {
-			    var index = queue[event].length;
-			    queue[event].push({
-			      element : element,
-			      done : done
-			    });
-			    queue[event].timer && $timeout.cancel(queue[event].timer);
-			    queue[event].timer = $timeout(function() {
-			      var elms = [], doneFns = [];
-			      angular.forEach(queue[event], function(item) {
-			        item && elms.push(item.element);
-			        doneFns.push(item.done);
-			      });
-			      var onDone = function() {
-			        angular.forEach(doneFns, function(fn) {
-			          fn();
-			        });
-			      };
-			      onComplete(elms, onDone);
-			      queue[event] = [];
-			    }, 10, false);
-
-			    return function() {
-			      queue[event] = [];
-			    }
-			  };
+			var queueFn = newAnimationQueue($timeout);
 
 			return {
-				//enter: makeAnimFor(animation, $timeout),
-				enter: function ($el, done) {
-
-					var optsAttrVal = $el.attr('data-velocity-opts'),
-						scope = $el.scope(),
-						opts = {
-							complete: done
-						},
-						userOpts, completeFn;
-
-					if (optsAttrVal) {
-						userOpts = $parse(optsAttrVal)(scope);
-						angular.extend(opts, userOpts);
-						if (userOpts.complete) {
-							opts.complete = function () {
-								done();
-								scope.$apply(userOpts.complete);
-							};
-						}
-					}
-
-					console.log(opts);
-
-					$el.css('opacity', 0);
-
-					var cancel = queueAllAnimations('enter', $el[0], done, function(elements, done) {
-						$(elements).velocity(animation, opts);
-					});
-
-					return function onClose(cancelled) {
-						cancelled && cancel();
-					};
-				},
-				leave: makeAnimFor(animation, $timeout),
-				move: makeAnimFor(animation, $timeout),
-				addClass: makeClassAnimFor(animation),
-				removeClass: makeClassAnimFor(animation)
+				enter: makeGroupedAnimFor(animation, 'enter', queueFn, $parse),
+				leave: makeGroupedAnimFor(animation, 'leave', queueFn, $parse),
+				move: makeAnimFor(animation, $parse),
+				addClass: makeClassAnimFor(animation, $parse),
+				removeClass: makeClassAnimFor(animation, $parse)
 			};
-		};
+		}];
 	}
 
+	// Factory for making opposite animations
 	function makeOppositesAnimationFor(animation) {
-		// console.log('Made opposite animation');
+		return ['$timeout', '$parse', function ($timeout, $parse) {
+			var queueFn = newAnimationQueue($timeout);
 
-		var opp = animation.replace('In', 'Out');
+			var opp = animation.replace('In', 'Out');
 
-		if (opp.indexOf('Down') > -1) {
-			opp = opp.replace('Down', 'Up');
-		}
-		else if (opp.indexOf('Up') > -1) {
-			opp = opp.replace('Up', 'Down');
-		}
-		else if (opp.indexOf('Left') > -1) {
-			opp = opp.replace('Left', 'Right');
-		}
-		else if (opp.indexOf('Right') > -1) {
-			opp = opp.replace('Right', 'Left');
-		}
+			if (opp.indexOf('Down') > -1) {
+				opp = opp.replace('Down', 'Up');
+			}
+			else if (opp.indexOf('Up') > -1) {
+				opp = opp.replace('Up', 'Down');
+			}
+			else if (opp.indexOf('Left') > -1) {
+				opp = opp.replace('Left', 'Right');
+			}
+			else if (opp.indexOf('Right') > -1) {
+				opp = opp.replace('Right', 'Left');
+			}
 
-		return function () {
 			return {
-				enter: makeAnimFor(animation),
-				leave: makeAnimFor(opp),
-				move: makeAnimFor(animation),
-				addClass: makeClassAnimFor(animation),
-				removeClass: makeClassAnimFor(opp)
+				enter: makeGroupedAnimFor(animation, 'enter', queueFn, $parse),
+				leave: makeGroupedAnimFor(opp, 'leave', queueFn, $parse),
+				move: makeAnimFor(animation, $parse),
+				addClass: makeClassAnimFor(animation, $parse),
+				removeClass: makeClassAnimFor(opp, $parse)
 			};
-		};
+		}];
 	}
 
-	var i, animation, selector, oppositesSelector;
-	for (i = 0; i < animations.length; ++i) {
-		animation = animations[i];
-
-		selector = '.' + animationToClassName(animation);
-		oppositesSelector = '.' + animationToOppositesClassName(animation);
-
-		// console.log('Making animation for ' + animation + ' with selector ' + selector);
+	// Use the factories to define animations for all velocity's sequences
+	angular.forEach($.Velocity.Sequences, function (_, animation) {
+		var selector = '.' + animationToClassName(animation),
+			oppositesSelector = '.' + animationToOppositesClassName(animation);
 
 		app.animation(selector, makeAngularAnimationFor(animation));
 		
 		if (animation.substr(-2) === 'In') {
 			app.animation(oppositesSelector, makeOppositesAnimationFor(animation));
 		}
-	}
+	});
 
 })();
