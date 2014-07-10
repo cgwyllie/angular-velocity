@@ -6,8 +6,8 @@
 	var app = angular.module('angular-velocity', ['ngAnimate']);
 
 	// Check we have velocity and the UI pack
-	if (!$.Velocity || !$.Velocity.Utilities) {
-		throw "Velocity and Velocity UI Pack required, please include the relevant JS files...";
+	if (!$.Velocity || !$.Velocity.RegisterUI) {
+		throw "Velocity and Velocity UI Pack plugin required, please include the relevant JS files. Get Velocity with: bower install velocity";
 	}
 
 	// Utility to create class name for a sequence
