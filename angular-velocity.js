@@ -1,6 +1,6 @@
 
 (function () {
-	
+
 	'use strict';
 
 	var app = angular.module('angular-velocity', ['ngAnimate']);
@@ -111,7 +111,7 @@
 			if ('ng-hide' === className || 'ng-show' === className) {
 
 				var opts = getVelocityOpts($parse, $el, done);
-			
+
 				$el.velocity(animation, opts);
 
 				return function (cancel) {
@@ -191,12 +191,12 @@
 	}
 
 	// Use the factories to define animations for all velocity's sequences
-	angular.forEach($.Velocity.Sequences, function (_, animation) {
+	angular.forEach($.Velocity.RegisterUI.packagedEffects, function (_, animation) {
 		var selector = '.' + animationToClassName(animation),
 			oppositesSelector = '.' + animationToOppositesClassName(animation);
 
 		app.animation(selector, makeAngularAnimationFor(animation));
-		
+
 		if (animation.substr(-2) === 'In') {
 			app.animation(oppositesSelector, makeOppositesAnimationFor(animation));
 		}
