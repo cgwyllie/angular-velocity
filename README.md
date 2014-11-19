@@ -14,8 +14,8 @@ bower install angular-velocity --save
 ### Include Scripts
 
 ```html
-<script src="bower_components/velocity/jquery.velocity.min.js"></script>
-<script src="bower_components/velocity/velocity.ui.js"></script>
+<script src="bower_components/velocity/velocity.min.js"></script>
+<script src="bower_components/velocity/velocity.ui.min.js"></script>
 <script src="bower_components/angular-velocity/angular-velocity.min.js"></script>
 ```
 
@@ -96,4 +96,5 @@ This project is not associated officially with either AngularJS or Velocity. It 
 
 # Thanks
 
+- [@tvararu](https://github.com/tvararu) for updates to work with Velocity 1.x
 - [@rosslavery](https://github.com/rosslavery) for an example of how to access UI pack animations
