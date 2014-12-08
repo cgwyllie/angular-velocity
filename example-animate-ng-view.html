@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html ng-app="app">
+<head>
+	<title>angular-velocity ng-view Animation Example</title>
+	<!-- Use a bootswatch theme for some basic style -->
+	<link rel="stylesheet" href="bootstrap-darkly.min.css">
+	<style type="text/css">
+	/* A parent element to allow views to overlap as animated */
+	.view-container {
+		position: relative;
+	}
+	/* Make sure that ng-view is absolutely positioned in parent */
+	[ng-view] {
+		position: absolute;
+		width: 100%;
+	}
+	/* Specify z-index to make the entering view on top of the leaving one */
+	[ng-view].ng-leave {
+		z-index: 0;
+	}
+	[ng-view].ng-enter {
+		z-index: 1;
+	}
+	</style>
+</head>
+<body>
+
+<!-- Demo navigation navbar -->
+<div class="navbar navbar-default navbar-static-top">
+	<a class="navbar-brand" href="http://cgwyllie.github.io/angular-velocity">Angular Velocity</a>
+	<p class="navbar-text">ng-view animation example</p>
+	<ul class="nav navbar-nav">
+		<li><a href="#/one">One</a></li>
+		<li><a href="#/two">Two</a></li>
+		<li><a href="#/three">Three</a></li>
+	</ul>
+</div>
+
+<!-- The view container allows the animated views to overlap as they transition -->
+<div class="container view-container">
+	<!-- Declare the desired transition on the ng-view -->
+	<section class="velocity-opposites-transition-slideUpBigIn" ng-view></section>
+</div>
+
+<!-- Templates for the three 'slides' -->
+<script type="text/ng-template" id="one.html">
+<div class="jumbotron col-md-10 col-md-offset-1">
+	<h1>One</h1>
+	<p>This is an example of how to animate <code>ng-view</code> using angular-velocity (view source).</p>
+	<p class="clearfix"><a class="btn btn-primary btn-lg pull-right" href="#/two">Next</a></p>
+</div>
+</script>
+
+<script type="text/ng-template" id="two.html">
+<div class="jumbotron col-md-10 col-md-offset-1">
+	<h1>Two</h1>
+	<p>The <code>ng-view</code> is given a class of <code>velocity-opposites-transition-slideUpBigIn</code> which means it will play a <code>slideUpBigIn</code> when it enters, and a <code>slideDownBigOut</code> when it leaves.</p>
+	<p class="clearfix"><a class="btn btn-primary btn-lg pull-right" href="#/three">Next</a></p>
+</div>
+</script>
+
+<script type="text/ng-template" id="three.html">
+<div class="jumbotron col-md-10 col-md-offset-1">
+	<h1>Three</h1>
+	<p>To allow the views to overlap during animation, the view is absolutely positioned in a relatively positioned parent.</p>
+	<p class="clearfix"><a class="btn btn-primary btn-lg pull-right" href="#/one">First</a></p>
+</div>
+</script>
+
+<!-- Load scripts -->
+<script src="bower_components/jquery/dist/jquery.js"></script>
+<script src="bower_components/angular/angular.js"></script>
+<script src="bower_components/angular-animate/angular-animate.js"></script>
+<script src="bower_components/velocity/velocity.js"></script>
+<script src="bower_components/velocity/velocity.ui.min.js"></script>
+<script src="bower_components/angular-velocity/angular-velocity.js"></script>
+<script src="bower_components/angular-route/angular-route.js"></script>
+
+<!-- Create small demo app with three routes -->
+<script>
+	angular.module('app', ['ngRoute', 'angular-velocity'])
+		.config(function ($routeProvider) {
+			$routeProvider
+				.when('/one', {
+					templateUrl: 'one.html'
+				})
+				.when('/two', {
+					templateUrl: 'two.html'
+				})
+				.when('/three', {
+					templateUrl: 'three.html'
+				})
+				.otherwise({redirectTo: '/one'});
+		})
+		.controller('SlideCtrl', function ($scope, title) {
+			$scope.title = title;
+		});
+</script>
+
+</body>
+</html>

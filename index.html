@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html ng-app="app">
+<head>
+	<title>AngularJS ngAnimate integration for VelocityJS UI Pack | angular-velocity</title>
+	<!-- Use a bootswatch theme for some basic style -->
+	<link rel="stylesheet" href="bootstrap-darkly.min.css">
+	<style type="text/css">
+	[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+		display: none !important;
+	}
+	h2 .badge {
+		font-size: 70%;
+		margin-right: 15px;
+	}
+	.ng-enter {
+		display: none;
+	}
+	</style>
+</head>
+<body>
+
+<div class="navbar navbar-default navbar-static-top">
+	<a class="navbar-brand" href="http://cgwyllie.github.io/angular-velocity">Angular Velocity</a>
+	<p class="navbar-text"></p>
+	<ul class="nav navbar-nav pull-right">
+		<li><a href="https://github.com/cgwyllie/angular-velocity">Source</a></li>
+	</ul>
+</div>
+
+<!-- The view container allows the animated views to overlap as they transition -->
+<div class="container velocity-transition-slideRightBigIn" ng-show="show" ng-cloak>
+	<div class="jumbotron">
+		<h1>Velocity meets Angular</h1>
+		<p class="lead">ngAnimate integration for <a href="http://julian.com/research/velocity">Velocity</a>'s UI Pack transitions</p>
+		<p><code>bower install angular-velocity --save</code></p>
+		<p class="velocity-transition-slideUpIn" ng-show="show"><a href="https://github.com/cgwyllie/angular-velocity#getting-started" class="btn btn-lg btn-success">Getting Started &raquo;</a></p>
+	</div>
+
+	<div class="col-md-4 velocity-transition-fadeIn" data-velocity-opts="{stagger: 90}" ng-if="showExamples">
+		<h2>Features</h2>
+		<ul>
+			<li>Conventions based approach</li>
+			<li>Supports all velocity options (including stagger)</li>
+			<li>Includes additional 'opposite' transitions for ngEnter and ngLeave</li>
+		</ul>
+	</div>
+
+	<div class="col-md-4 velocity-transition-fadeIn" data-velocity-opts="{stagger: 60}" ng-if="showExamples">
+		<h2>Example</h2>
+		<p>See an example of animating <code>ng-view</code> with angular-velocity</p>
+		<p><a href="example-animate-ng-view.html" class="btn btn-default">Launch Demo</a></p>
+	</div>
+
+	<div class="col-md-4 velocity-transition-fadeIn" data-velocity-opts="{stagger: 50}" ng-if="showExamples">
+		<h2>Documentation</h2>
+		<p>Learn more about the conventions used, and how to apply the Velocity transitions in your app.</p>
+		<p><a href="https://github.com/cgwyllie/angular-velocity#usage" class="btn btn-default">Read More</a></p>
+	</div>
+</div>
+
+<script src="bower_components/jquery/dist/jquery.js"></script>
+<script src="bower_components/angular/angular.js"></script>
+<script src="bower_components/angular-animate/angular-animate.js"></script>
+<script src="bower_components/velocity/velocity.js"></script>
+<script src="bower_components/velocity/velocity.ui.min.js"></script>
+<script src="bower_components/angular-velocity/angular-velocity.js"></script>
+<script src="bower_components/angular-route/angular-route.js"></script>
+
+<script>
+	angular.module('app', ['angular-velocity'])
+		.run(function ($timeout, $rootScope) {
+			$timeout(function () {
+				$rootScope.show = true;
+			});
+			$timeout(function () {
+				$rootScope.showExamples = true;
+			}, 800);
+		});
+</script>
+
+</body>
+</html>

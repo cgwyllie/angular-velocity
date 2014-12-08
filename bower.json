@@ -1,0 +1,28 @@
+{
+  "name": "angular-velocity-docs",
+  "version": "0.2.0",
+  "homepage": "http://cgwyllie.github.io/angular-velocity",
+  "authors": [
+    "Christopher Wyllie <cgwyllie@gmail.com>"
+  ],
+  "description": "Documentation and examples for the angular-velocity library.",
+  "keywords": [
+    "AngularJS",
+    "Velocity",
+    "ngAnimate",
+    "docs"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular-velocity": "~0.2.0",
+    "angular-route": "~1.3.5"
+  }
+}
