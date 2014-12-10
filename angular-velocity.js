@@ -5,6 +5,10 @@
 
 	var app = angular.module('angular-velocity', ['ngAnimate']);
 
+	// Some 'constants'
+	var CLASS_ANIM_ADD = 0,
+		CLASS_ANIM_REMOVE = 1;
+
 	// Check we have velocity and the UI pack
 	if (!$.Velocity || !$.Velocity.RegisterUI) {
 		throw "Velocity and Velocity UI Pack plugin required, please include the relevant JS files. Get Velocity with: bower install velocity";
@@ -88,6 +92,14 @@
 			};
 	}
 
+	function makeCancelFunctionFor($el) {
+		return function (cancel) {
+			if (cancel) {
+				$el.velocity('stop');
+			}
+		};
+	}
+
 	// Factory for the angular animation effect function (move animations)
 	function makeAnimFor(animation, $parse) {
 		return function ($el, done) {
@@ -96,29 +108,26 @@
 
 			$el.velocity(animation, opts);
 
-			return function (cancel) {
-				if (cancel) {
-					$el.velocity('stop');
-				}
-			};
+			return makeCancelFunctionFor($el);
 		};
 	}
 
-	// Factory for the angular animation effect function (class animations)
-	function makeClassAnimFor(animation, $parse) {
+	// Factory for the angular animation effect function (class animations (ng-hide))
+	function makeClassAnimFor(addOrRemove, addAnim, removeAnim, $parse) {
 		return function ($el, className, done) {
 
-			if ('ng-hide' === className || 'ng-show' === className) {
+			var animation = addAnim,
+				opts;
 
-				var opts = getVelocityOpts($parse, $el, done);
+			if ('ng-hide' === className) {
+
+				animation = (addOrRemove === CLASS_ANIM_ADD) ? removeAnim : animation;
+
+				opts = getVelocityOpts($parse, $el, done);
 
 				$el.velocity(animation, opts);
 
-				return function (cancel) {
-					if (cancel) {
-						$el.velocity('stop');
-					}
-				};
+				return makeCancelFunctionFor($el);
 			}
 		};
 	}
@@ -154,8 +163,8 @@
 				'enter': makeGroupedAnimFor(animation, 'enter', queueFn, $parse),
 				'leave': makeGroupedAnimFor(animation, 'leave', queueFn, $parse),
 				'move': makeAnimFor(animation, $parse),
-				'addClass': makeClassAnimFor(animation, $parse),
-				'removeClass': makeClassAnimFor(animation, $parse)
+				'addClass': makeClassAnimFor(CLASS_ANIM_ADD, animation, animation, $parse),
+				'removeClass': makeClassAnimFor(CLASS_ANIM_REMOVE, animation, animation, $parse)
 			};
 		}];
 	}
@@ -184,8 +193,8 @@
 				'enter': makeGroupedAnimFor(animation, 'enter', queueFn, $parse),
 				'leave': makeGroupedAnimFor(opp, 'leave', queueFn, $parse),
 				'move': makeAnimFor(animation, $parse),
-				'addClass': makeClassAnimFor(animation, $parse),
-				'removeClass': makeClassAnimFor(opp, $parse)
+				'addClass': makeClassAnimFor(CLASS_ANIM_ADD, animation, opp, $parse),
+				'removeClass': makeClassAnimFor(CLASS_ANIM_REMOVE, animation, opp, $parse)
 			};
 		}];
 	}
