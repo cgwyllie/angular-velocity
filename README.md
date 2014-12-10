@@ -90,6 +90,12 @@ Staggering is supported for `ngEnter` and `ngLeave` animations. This works espec
 
 Please feel free to fork, push, pull and all that other good Git stuff!
 
+### Compression
+
+```
+uglifyjs angular-velocity.js -c -m -r '$,angular' --source-map angular-velocity.min.map -o angular-velocity.min.js
+```
+
 # Disclaimer
 
 This project is not associated officially with either AngularJS or Velocity. It is just a little utility that was quickly thrown together to bridge an animation-shaped gap.
