@@ -222,4 +222,16 @@
 		}
 	});
 
+	app.provider('angularVelocityConfig', function () {
+		var config = {};
+		return {
+			setDefaultOptions: function (opts) {
+				confg = opts;
+			},
+			'$get': function () {
+				return config;
+			}
+		};
+	});
+
 })();
