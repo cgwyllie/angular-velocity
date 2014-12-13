@@ -36,11 +36,22 @@
 		if (optsAttrVal) {
 			userOpts = $parse(optsAttrVal)(scope);
 			angular.extend(opts, userOpts);
+			if (userOpts.begin) {
+				opts.begin = function () {
+					var args = Array.prototype.slice.call(arguments, 0);
+					scope.$apply(function () {
+						userOpts.begin.apply(args[0], args);
+					});
+				};
+			}
 			if (userOpts.complete) {
 				opts.complete = function () {
-					done();
-					scope.$apply(userOpts.complete);
+					var args = Array.prototype.slice.call(arguments, 0);
+					scope.$apply(function () {
+						userOpts.complete.apply(args[0], args);
+					});
 					scope = null;
+					done();
 				};
 			}
 		}
