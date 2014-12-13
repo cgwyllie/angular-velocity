@@ -10,7 +10,7 @@
 		CLASS_ANIM_REMOVE = 1;
 
 	// Check we have velocity and the UI pack
-	if (!$.Velocity || !$.Velocity.RegisterUI) {
+	if (!$.Velocity || !$.Velocity.RegisterEffect) {
 		throw "Velocity and Velocity UI Pack plugin required, please include the relevant JS files. Get Velocity with: bower install velocity";
 	}
 
@@ -211,7 +211,7 @@
 	}
 
 	// Use the factories to define animations for all velocity's sequences
-	angular.forEach($.Velocity.RegisterUI.packagedEffects, function (_, animation) {
+	angular.forEach($.Velocity.RegisterEffect.packagedEffects, function (_, animation) {
 		var selector = '.' + animationToClassName(animation),
 			oppositesSelector = '.' + animationToOppositesClassName(animation);
 
