@@ -3,7 +3,7 @@
 
 	'use strict';
 
-	var app = angular.module('angular-velocity', ['ngAnimate']);
+	var app = angular.module('angular-velocity', ['ngAnimate', 'angular-velocity.ui-router']);
 
 	// Some 'constants'
 	var CLASS_ANIM_ADD = 0,
@@ -222,23 +222,47 @@
 		}
 	});
 
-	// Possible states:
-	// 'child', 'parent', 'sibling', 'root'
-	var historyStack = {
-		stack: [],
-		stackPtr: -1,
-		normalizePath: function (path) {
-			return path.substr(1); // Trim leading '/'
-		},
-		splitPath: function (path) {
+	app.animation('.animated-view', function ($parse, viewAnimationDirector) {
+		return {
+			'enter': function ($el, done) {
+				var trans = viewAnimationDirector.getTransition(),
+					opts = getVelocityOpts($parse, $el, done);
+				console.log('enter with ' + trans.enter);
+
+				$el.velocity(trans.enter, opts);
+			},
+			'leave': function ($el, done) {
+				var trans = viewAnimationDirector.getTransition(),
+					opts = getVelocityOpts($parse, $el, done);
+				console.log('leave with ' + trans.leave);
+
+				$el.velocity(trans.leave, opts);
+			}
+		};
+	});
+
+	app.service('historyStack', [function () {
+		// Possible states:
+		// 'child', 'parent', 'sibling', 'root'
+		this.stack = [];
+		this.stackPtr = -1;
+		this.normalizePath = function (path) {
+			path = path.replace(/^#?\//, ''); // Trim leading '#/' if present
+			console.log('normal path: ' + path);
+			return path;
+		};
+
+		this.splitPath = function (path) {
 			return path.split('/');
-		},
-		push: function (path) {
+		};
+		
+		this.push = function (path) {
 			this.stack.push(this.normalizePath(path));
 			++this.stackPtr;
 			// console.log(this.stack);
-		},
-		getType: function (toPath) {
+		};
+
+		this.getType = function (toPath) {
 			if (this.stackPtr < 0) {
 				return 'new';
 			}
@@ -286,8 +310,9 @@
 			}
 
 			return 'unknown';
-		},
-		getDirection: function (toPath) {
+		};
+
+		this.getDirection = function (toPath) {
 			switch (this.getType(toPath)) {
 				case 'new':
 				case 'root change':
@@ -298,57 +323,63 @@
 				case 'child':
 					return 'forward';
 			}
-		}
-	};
-
-	app.animation('.animated-view', function ($parse, viewAnimationDirector) {
-		return {
-			'enter': function ($el, done) {
-				var trans = viewAnimationDirector.getTransition(),
-					opts = getVelocityOpts($parse, $el, done);
-				console.log('enter with ' + trans.enter);
-
-				$el.velocity(trans.enter, opts);
-			},
-			'leave': function ($el, done) {
-				var trans = viewAnimationDirector.getTransition(),
-					opts = getVelocityOpts($parse, $el, done);
-				console.log('leave with ' + trans.leave);
-
-				$el.velocity(trans.leave, opts);
-			}
 		};
-	});
+	}])
 
-	app.service('viewAnimationDirector', function ($rootScope) {
+	// app.service('viewAnimationDirector', function ($rootScope, $state) {
+	app.service('viewAnimationDirector', function ($rootScope, historyStack) {
 		var dirTransMap = {
-			none: {
-				enter: 'transition.fadeIn',
-				leave: 'transition.fadeOut'
+				none: {
+					enter: 'transition.fadeIn',
+					leave: 'transition.fadeOut'
+				},
+				back: {
+					enter: 'transition.slideLeftIn',
+					leave: 'transition.slideRightOut',
+				},
+				forward: {
+					enter: 'transition.slideRightIn',
+					leave: 'transition.slideLeftOut'
+				}
 			},
-			back: {
-				enter: 'transition.slideLeftIn',
-				leave: 'transition.slideRightOut',
-			},
-			forward: {
-				enter: 'transition.slideRightIn',
-				leave: 'transition.slideLeftOut'
-			}
-		};
+			trans = dirTransMap['none'];
 
-		var trans = dirTransMap['none'];
+		// $rootScope.$on('$routeChangeStart', function (_, to, from) {
+		// 	var toPath = to.$$route.originalPath,
+		// 		dir = historyStack.getDirection(toPath);
+			
+		// 	trans = dirTransMap[dir];
+			
+		// 	historyStack.push(toPath);
+		// });
 
-		$rootScope.$on('$routeChangeStart', function (_, to, from) {
-			var toPath = to.$$route.originalPath,
-				dir = historyStack.getDirection(toPath);
+		// $rootScope.$on('$stateChangeStart', function (_, to, toParams) {
+		// 	// console.log(to);
+		// 	// // console.log($state.href(to, toParams));
+
+		// 	var toPath = $state.href(to, toParams),
+		// 		dir = historyStack.getDirection(toPath);
 			
-			trans = dirTransMap[dir];
-			
-			historyStack.push(toPath);
-		});
+		// 	console.log(dir);
+
+		// 	trans = dirTransMap[dir];
+		// });
+
+		// $rootScope.$on('$stateChangeSuccess', function (_, to, toParams) {
+		// 	var toPath = $state.href(to, toParams);
+		// 	historyStack.push(toPath);
+		// });
 
 		this.getTransition = function () {
 			return trans;
+		};
+
+		this.pushPath = function (path) {
+			var dir = historyStack.getDirection(path);
+
+			trans = dirTransMap[dir];
+
+			historyStack.push(path);
 		};
 	});
 
