@@ -222,4 +222,134 @@
 		}
 	});
 
+	// Possible states:
+	// 'child', 'parent', 'sibling', 'root'
+	var historyStack = {
+		stack: [],
+		stackPtr: -1,
+		normalizePath: function (path) {
+			return path.substr(1); // Trim leading '/'
+		},
+		splitPath: function (path) {
+			return path.split('/');
+		},
+		push: function (path) {
+			this.stack.push(this.normalizePath(path));
+			++this.stackPtr;
+			// console.log(this.stack);
+		},
+		getType: function (toPath) {
+			if (this.stackPtr < 0) {
+				return 'new';
+			}
+
+			toPath = this.normalizePath(toPath);
+
+			var rootParts = this.splitPath(this.stack[0]),
+				toParts = this.splitPath(toPath),
+				prevParts, prevPath;
+
+			if (rootParts[0] !== toParts[0]) {
+				this.stack = [];
+				this.stackPtr = -1;
+				return 'root change';
+			}
+
+			// Else the root is the same and it must be a child, parent, or sibling
+			prevPath = this.stack[ this.stackPtr ];
+			prevParts = this.splitPath(prevPath);
+
+			var sharedLength = Math.min(toParts.length, prevParts.length),
+				sharedRoot = true;
+
+			for (var i = 0; i < sharedLength; ++i) {
+				sharedRoot = sharedRoot && (prevParts[i] === toParts[i]);
+			}
+
+			// console.log('Shared root:');
+			// console.log(sharedRoot);
+
+			if (prevParts.length === toParts.length) {
+				// Shot at 'sibling'
+				return 'sibling';
+			}
+			else if (!sharedRoot) {
+				return 'root change';
+			}
+			else {
+				if (toParts.length < prevParts.length) {
+					return 'parent';
+				}
+				else {
+					return 'child';
+				}
+			}
+
+			return 'unknown';
+		},
+		getDirection: function (toPath) {
+			switch (this.getType(toPath)) {
+				case 'new':
+				case 'root change':
+				case 'sibling':
+					return 'none';
+				case 'parent':
+					return 'back';
+				case 'child':
+					return 'forward';
+			}
+		}
+	};
+
+	app.animation('.animated-view', function ($parse, viewAnimationDirector) {
+		return {
+			'enter': function ($el, done) {
+				var trans = viewAnimationDirector.getTransition(),
+					opts = getVelocityOpts($parse, $el, done);
+				console.log('enter with ' + trans.enter);
+
+				$el.velocity(trans.enter, opts);
+			},
+			'leave': function ($el, done) {
+				var trans = viewAnimationDirector.getTransition(),
+					opts = getVelocityOpts($parse, $el, done);
+				console.log('leave with ' + trans.leave);
+
+				$el.velocity(trans.leave, opts);
+			}
+		};
+	});
+
+	app.service('viewAnimationDirector', function ($rootScope) {
+		var dirTransMap = {
+			none: {
+				enter: 'transition.fadeIn',
+				leave: 'transition.fadeOut'
+			},
+			back: {
+				enter: 'transition.slideLeftIn',
+				leave: 'transition.slideRightOut',
+			},
+			forward: {
+				enter: 'transition.slideRightIn',
+				leave: 'transition.slideLeftOut'
+			}
+		};
+
+		var trans = dirTransMap['none'];
+
+		$rootScope.$on('$routeChangeStart', function (_, to, from) {
+			var toPath = to.$$route.originalPath,
+				dir = historyStack.getDirection(toPath);
+			
+			trans = dirTransMap[dir];
+			
+			historyStack.push(toPath);
+		});
+
+		this.getTransition = function () {
+			return trans;
+		};
+	});
+
 })();
