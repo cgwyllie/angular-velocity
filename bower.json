@@ -1,6 +1,6 @@
 {
   "name": "angular-velocity",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "main": "angular-velocity.min.js",
   "authors": [
     "Christopher Wyllie <cgwyllie@gmail.com>"
@@ -24,6 +24,6 @@
   "dependencies": {
     "angular-animate": "~1.3.1",
     "angular": "~1.3.1",
-    "velocity": "~1.1.0"
+    "velocity": "~1.2.0"
   }
 }
