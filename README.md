@@ -102,5 +102,6 @@ This project is not associated officially with either AngularJS or Velocity. It 
 
 # Thanks
 
+- [@MikaAK](https://github.com/MikaAK) for jQuery dependency removal
 - [@tvararu](https://github.com/tvararu) for updates to work with Velocity 1.x
 - [@rosslavery](https://github.com/rosslavery) for an example of how to access UI pack animations
