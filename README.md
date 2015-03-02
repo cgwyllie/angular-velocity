@@ -19,6 +19,8 @@ bower install angular-velocity --save
 <script src="bower_components/angular-velocity/angular-velocity.min.js"></script>
 ```
 
+> N.B. angular-velocity assumes that the Angular core and the additional `ngAnimate` module is loaded. `ngAnimate` can be found in the AngularJS 'additional modules'.
+
 ### Declare Angular Dependency
 
 ```javascript
