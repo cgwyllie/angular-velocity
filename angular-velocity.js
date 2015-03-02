@@ -5,12 +5,12 @@
 
 	var app = angular.module('angular-velocity', ['ngAnimate']);
 
-	// Some 'constants'
-	var CLASS_ANIM_ADD = 0,
-		CLASS_ANIM_REMOVE = 1;
+	var CLASS_ANIM_ADD 	  = 0,
+		CLASS_ANIM_REMOVE = 1,
+		Velocity = window.Velocity || (window.jQuery && jQuery.Velocity);
 
 	// Check we have velocity and the UI pack
-	if (!$.Velocity || !$.Velocity.RegisterEffect) {
+	if (!Velocity || !Velocity.RegisterEffect) {
 		throw "Velocity and Velocity UI Pack plugin required, please include the relevant JS files. Get Velocity with: bower install velocity";
 	}
 
@@ -106,7 +106,7 @@
 	function makeCancelFunctionFor($el) {
 		return function (cancel) {
 			if (cancel) {
-				$el.velocity('stop');
+				Velocity($el, 'stop');
 			}
 		};
 	}
@@ -117,7 +117,7 @@
 
 			var opts = getVelocityOpts($parse, $el, done);
 
-			$el.velocity(animation, opts);
+			Velocity($el, animation, opts);
 
 			return makeCancelFunctionFor($el);
 		};
@@ -136,7 +136,7 @@
 
 				opts = getVelocityOpts($parse, $el, done);
 
-				$el.velocity(animation, opts);
+				Velocity($el, animation, opts);
 
 				return makeCancelFunctionFor($el);
 			}
@@ -155,7 +155,7 @@
 
 			cancel = queueFn(event, $el[0], done, function(elements, onQueueDone) {
 				var opts = getVelocityOpts($parse, $el, onQueueDone);
-				$(elements).velocity(animation, opts);
+				Velocity(elements, animation, opts);
 			});
 
 			return function onClose(cancelled) {
@@ -211,7 +211,7 @@
 	}
 
 	// Use the factories to define animations for all velocity's sequences
-	angular.forEach($.Velocity.RegisterEffect.packagedEffects, function (_, animation) {
+	angular.forEach(Velocity.RegisterEffect.packagedEffects, function (_, animation) {
 		var selector = '.' + animationToClassName(animation),
 			oppositesSelector = '.' + animationToOppositesClassName(animation);
 
