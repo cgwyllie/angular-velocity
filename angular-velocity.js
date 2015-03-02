@@ -146,15 +146,15 @@
 	// Factory for the angular animation effect function (grouped animations)
 	function makeGroupedAnimFor(animation, event, queueFn, $parse) {
 		return function ($el, done) {
-
-			var opts = getVelocityOpts($parse, $el, done);
+			var cancel;
 
 			// Hide element so it doesn't briefly show whilst queue is built
 			if (event === 'enter') {
 				$el.css('opacity', 0);
 			}
 
-			var cancel = queueFn(event, $el[0], done, function(elements, done) {
+			cancel = queueFn(event, $el[0], done, function(elements, onQueueDone) {
+				var opts = getVelocityOpts($parse, $el, onQueueDone);
 				$(elements).velocity(animation, opts);
 			});
 
