@@ -51,9 +51,27 @@ For example:
 
 ```html
 <div ng-view class="velocity-opposites-transition-slideUpIn">
+	I enter with a transition.slideUpIn.<br>
 	I leave with a transition.slideDownOut.
 </div>
 ```
+
+### Different Enter & Leave Animations
+
+Angular Velocity defines an enter animation for every 'In' transition, and a leave animation for every 'Out' transition.
+
+These are defined with the prefixes `velocity-enter-` and `velocity-leave-`, which work with ngEnter & ngShow, and ngLeave & ngHide respectively.
+
+For example:
+
+```html
+<div ng-view class="velocity-enter-transition-slideRightIn velocity-leave-transition-slideDownOut">
+	I enter with a transition.slideRightIn.<br>
+	I leave with a transition.slideDownOut.
+</div>
+```
+
+> You do not have to use an enter and a leave transition, they are independednt and you can specify them separaetly if desired.
 
 ### Velocity Options
 
