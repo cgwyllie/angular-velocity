@@ -11,13 +11,28 @@
 bower install angular-velocity --save
 ```
 
-### Include Scripts
+#### Include Scripts
 
 ```html
 <script src="bower_components/velocity/velocity.min.js"></script>
 <script src="bower_components/velocity/velocity.ui.min.js"></script>
 <script src="bower_components/angular-velocity/angular-velocity.min.js"></script>
 ```
+
+> N.B. angular-velocity assumes that the Angular core and the additional `ngAnimate` module is loaded. `ngAnimate` can be found in the AngularJS 'additional modules'.
+
+### Install with npm
+
+```
+npm install angular-velocity --save
+```
+
+#### Include Scripts
+
+```html
+<script src="node_modules/angular-velocity/angular-velocity.min.js"></script>
+```
+> N.B. When installing from npm, it is assumed that VelocityJS will be installed and loaded before Angular Velocity.
 
 > N.B. angular-velocity assumes that the Angular core and the additional `ngAnimate` module is loaded. `ngAnimate` can be found in the AngularJS 'additional modules'.
 
