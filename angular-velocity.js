@@ -252,7 +252,7 @@
 	}
 
 	// Use the factories to define animations for all velocity's sequences
-	angular.forEach(Velocity.RegisterEffect.packagedEffects, function (_, animation) {
+	angular.forEach(Velocity.Redirects, function (_, animation) {
 		var IN = 'In',
 			OUT = 'Out',
 			selector = '.' + animationToClassName(animation),
