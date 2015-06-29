@@ -3,8 +3,6 @@
 
 	'use strict';
 
-	var app = angular.module('angular-velocity', ['ngAnimate']);
-
 	var CLASS_ANIM_ADD 	  = 0,
 		CLASS_ANIM_REMOVE = 1,
 		Velocity = window.Velocity || (window.jQuery && jQuery.Velocity);
@@ -252,24 +250,29 @@
 	}
 
 	// Use the factories to define animations for all velocity's sequences
-	angular.forEach(Velocity.RegisterEffect.packagedEffects, function (_, animation) {
-		var IN = 'In',
-			OUT = 'Out',
-			selector = '.' + animationToClassName(animation),
-			oppositesSelector = '.' + animationToOppositesClassName(animation),
-			enterSelector, leaveSelector;
+	angular
+		.module('angular-velocity', ['ngAnimate'])
+		.config(['$animateProvider', function ($animateProvider) {
+			// Use the factories to define animations for all velocity's sequences
+			angular.forEach(Velocity.Redirects, function (_, animation) {
+				var IN = 'In',
+					OUT = 'Out',
+					selector = '.' + animationToClassName(animation),
+					oppositesSelector = '.' + animationToOppositesClassName(animation),
+					enterSelector, leaveSelector;
 
-		app.animation(selector, makeAngularAnimationFor(animation));
+				$animateProvider.register(selector, makeAngularAnimationFor(animation));
 
-		if (animation.substr(-2) === IN) {
-			enterSelector = '.' + animationToEnterClassName(animation);
-			app.animation(oppositesSelector, makeOppositesAnimationFor(animation));
-			app.animation(enterSelector, makeEnterAnimationFor(animation));
-		}
-		else if (animation.substr(-3) === OUT) {
-			leaveSelector = '.' + animationToLeaveClassName(animation);
-			app.animation(leaveSelector, makeLeaveAnimationFor(animation));
-		}
-	});
+				if (animation.substr(-2) === IN) {
+					enterSelector = '.' + animationToEnterClassName(animation);
+					$animateProvider.register(oppositesSelector, makeOppositesAnimationFor(animation));
+					$animateProvider.register(enterSelector, makeEnterAnimationFor(animation));
+				}
+				else if (animation.substr(-3) === OUT) {
+					leaveSelector = '.' + animationToLeaveClassName(animation);
+					$animateProvider.register(leaveSelector, makeLeaveAnimationFor(animation));
+				}
+			});
+		}]);
 
 })();
